@@ -44,7 +44,7 @@ public partial class InitialCreate : Migration
             columns: table => new
             {
                 ItemId = table.Column<int>(nullable: false).Annotation("SqlServer:Identity", "1, 1"),
-                ItemNumber = table.Column<string>(maxLength: 9, nullable: false),
+                ItemNumber = table.Column<int>(nullable: false),
                 ItemName = table.Column<string>(maxLength: 100, nullable: false),
                 ItemDescription = table.Column<string>(maxLength: 500, nullable: true),
                 LocationId = table.Column<int>(nullable: false),
@@ -94,6 +94,41 @@ public partial class InitialCreate : Migration
             {
                 table.PrimaryKey("PK_InventoryTransactions", x => x.TransactionId);
                 table.ForeignKey("FK_InventoryTransactions_InventoryItems_ItemId", x => x.ItemId, "InventoryItems", "ItemId", onDelete: ReferentialAction.Cascade);
+            });
+
+        migrationBuilder.InsertData(
+            table: "Locations",
+            columns: new[] { "LocationId", "LocationCode", "Aisle", "Rack", "Shelf", "LocationDescription", "IsActive" },
+            columnTypes: new[] { "int", "nvarchar(20)", "nvarchar(10)", "nvarchar(10)", "nvarchar(10)", "nvarchar(150)", "bit" },
+            values: new object[,]
+            {
+                { 1, "A-01-01", "A", "01", "01", "Front storage rack", true },
+                { 2, "A-01-02", "A", "01", "02", "Second shelf", true },
+                { 3, "B-02-01", "B", "02", "01", "Electronics storage", true },
+                { 4, "C-01-01", "C", "01", "01", "Repair area", true }
+            });
+
+        migrationBuilder.InsertData(
+            table: "InventoryItems",
+            columns: new[] { "ItemId", "ItemNumber", "ItemName", "ItemDescription", "LocationId", "ConditionName", "Quantity", "ReorderLevel", "DateAdded", "LastUpdated" },
+            columnTypes: new[] { "int", "int", "nvarchar(100)", "nvarchar(500)", "int", "nvarchar(30)", "int", "int", "datetime2", "datetime2" },
+            values: new object[,]
+            {
+                { 1, 1, "Business Laptop", "14-inch business laptop", 3, "Good", 8, 3, new DateTime(2024, 12, 1), new DateTime(2024, 12, 1) },
+                { 2, 2, "USB-C Cable", "1-meter charging cable", 1, "New", 25, 10, new DateTime(2024, 12, 1), new DateTime(2024, 12, 1) },
+                { 3, 3, "LED Monitor", "24-inch LED monitor", 2, "Fair", 4, 5, new DateTime(2024, 12, 1), new DateTime(2024, 12, 1) },
+                { 4, 4, "Inspection Laptop", "Awaiting diagnostic testing", 4, "Damaged", 1, 1, new DateTime(2024, 12, 1), new DateTime(2024, 12, 1) }
+            });
+
+        migrationBuilder.InsertData(
+            table: "InventoryComments",
+            columns: new[] { "CommentId", "ItemId", "CommentText", "CommentDate", "CommentedBy" },
+            columnTypes: new[] { "int", "int", "nvarchar(1000)", "datetime2", "nvarchar(100)" },
+            values: new object[,]
+            {
+                { 1, 1, "Tested and ready for deployment.", new DateTime(2024, 12, 1), "Warehouse Admin" },
+                { 2, 3, "Low stock; check condition before issuing.", new DateTime(2024, 12, 1), "Warehouse Admin" },
+                { 3, 4, "Hold for inspection.", new DateTime(2024, 12, 1), "Warehouse Admin" }
             });
     }
 

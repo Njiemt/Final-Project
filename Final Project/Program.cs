@@ -34,6 +34,7 @@ app.MapGet("/", () => Results.Redirect("/swagger"));
 using (var scope = app.Services.CreateScope())
 {
     var database = scope.ServiceProvider.GetRequiredService<WarehouseDbContext>();
+    database.Database.EnsureDeleted();
     database.Database.Migrate();
 }
 

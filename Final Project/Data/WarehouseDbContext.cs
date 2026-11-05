@@ -51,11 +51,11 @@ public sealed class WarehouseDbContext : DbContext
         modelBuilder.Entity<InventoryItem>(entity =>
         {
             entity.ToTable("InventoryItems");
-            entity.HasCheckConstraint("CK_InventoryItems_ItemNumber_9Digits", "LEN([ItemNumber]) = 9 AND [ItemNumber] NOT LIKE '%[^0-9]%'");
+            entity.HasCheckConstraint("CK_InventoryItems_ItemNumber_Positive", "[ItemNumber] > 0");
             entity.HasCheckConstraint("CK_InventoryItems_Quantity", "[Quantity] >= 0");
             entity.HasCheckConstraint("CK_InventoryItems_ReorderLevel", "[ReorderLevel] >= 0");
             entity.HasKey(x => x.ItemId);
-            entity.Property(x => x.ItemNumber).HasMaxLength(9).IsFixedLength(false).IsRequired();
+            entity.Property(x => x.ItemNumber).IsRequired();
             entity.Property(x => x.ItemName).HasMaxLength(100).IsRequired();
             entity.Property(x => x.ItemDescription).HasMaxLength(500);
             entity.Property(x => x.ConditionName).HasMaxLength(30).IsRequired();
@@ -102,7 +102,7 @@ public sealed class WarehouseDbContext : DbContext
             entity.ToTable("TeamMembers");
             entity.HasCheckConstraint("CK_TeamMembers_YearInProgram", "[YearInProgram] >= 1");
             entity.HasKey(x => x.MemberId);
-            entity.Property(x => x.EmployeeId).HasMaxLength(20).IsRequired();
+            entity.Property(x => x.EmployeeId).IsRequired();
             entity.Property(x => x.FullName).HasMaxLength(150).IsRequired();
             entity.Property(x => x.CollegeProgram).HasMaxLength(100).IsRequired();
             entity.Property(x => x.Email).HasMaxLength(150);
@@ -116,10 +116,10 @@ public sealed class WarehouseDbContext : DbContext
             new Location { LocationId = 4, LocationCode = "C-01-01", Aisle = "C", Rack = "01", Shelf = "01", LocationDescription = "Repair area", IsActive = true });
 
         modelBuilder.Entity<InventoryItem>().HasData(
-            new InventoryItem { ItemId = 1, ItemNumber = "000000001", ItemName = "Business Laptop", ItemDescription = "14-inch business laptop", LocationId = 3, ConditionName = "Good", Quantity = 8, ReorderLevel = 3, DateAdded = new DateTime(2024, 12, 1), LastUpdated = new DateTime(2024, 12, 1) },
-            new InventoryItem { ItemId = 2, ItemNumber = "000000002", ItemName = "USB-C Cable", ItemDescription = "1-meter charging cable", LocationId = 1, ConditionName = "New", Quantity = 25, ReorderLevel = 10, DateAdded = new DateTime(2024, 12, 1), LastUpdated = new DateTime(2024, 12, 1) },
-            new InventoryItem { ItemId = 3, ItemNumber = "000000003", ItemName = "LED Monitor", ItemDescription = "24-inch LED monitor", LocationId = 2, ConditionName = "Fair", Quantity = 4, ReorderLevel = 5, DateAdded = new DateTime(2024, 12, 1), LastUpdated = new DateTime(2024, 12, 1) },
-            new InventoryItem { ItemId = 4, ItemNumber = "000000004", ItemName = "Inspection Laptop", ItemDescription = "Awaiting diagnostic testing", LocationId = 4, ConditionName = "Damaged", Quantity = 1, ReorderLevel = 1, DateAdded = new DateTime(2024, 12, 1), LastUpdated = new DateTime(2024, 12, 1) });
+            new InventoryItem { ItemId = 1, ItemNumber = 1, ItemName = "Business Laptop", ItemDescription = "14-inch business laptop", LocationId = 3, ConditionName = "Good", Quantity = 8, ReorderLevel = 3, DateAdded = new DateTime(2024, 12, 1), LastUpdated = new DateTime(2024, 12, 1) },
+            new InventoryItem { ItemId = 2, ItemNumber = 2, ItemName = "USB-C Cable", ItemDescription = "1-meter charging cable", LocationId = 1, ConditionName = "New", Quantity = 25, ReorderLevel = 10, DateAdded = new DateTime(2024, 12, 1), LastUpdated = new DateTime(2024, 12, 1) },
+            new InventoryItem { ItemId = 3, ItemNumber = 3, ItemName = "LED Monitor", ItemDescription = "24-inch LED monitor", LocationId = 2, ConditionName = "Fair", Quantity = 4, ReorderLevel = 5, DateAdded = new DateTime(2024, 12, 1), LastUpdated = new DateTime(2024, 12, 1) },
+            new InventoryItem { ItemId = 4, ItemNumber = 4, ItemName = "Inspection Laptop", ItemDescription = "Awaiting diagnostic testing", LocationId = 4, ConditionName = "Damaged", Quantity = 1, ReorderLevel = 1, DateAdded = new DateTime(2024, 12, 1), LastUpdated = new DateTime(2024, 12, 1) });
 
         modelBuilder.Entity<InventoryComment>().HasData(
             new InventoryComment { CommentId = 1, ItemId = 1, CommentText = "Tested and ready for deployment.", CommentedBy = "Warehouse Admin", CommentDate = new DateTime(2024, 12, 1) },
@@ -130,7 +130,7 @@ public sealed class WarehouseDbContext : DbContext
             new TeamMember
             {
                 MemberId = 1,
-                EmployeeId = "EMP001",
+                EmployeeId = 1,
                 FullName = "Mohamed Njie",
                 Birthdate = new DateTime(2007, 7, 2),
                 CollegeProgram = "IT Software Development",
@@ -155,7 +155,7 @@ public sealed class Location
 public sealed class InventoryItem
 {
     public int ItemId { get; set; }
-    public string ItemNumber { get; set; } = "";
+    public int ItemNumber { get; set; }
     public string ItemName { get; set; } = "";
     public string? ItemDescription { get; set; }
     public int LocationId { get; set; }
@@ -196,7 +196,7 @@ public sealed class InventoryTransaction
 public sealed class TeamMember
 {
     public int MemberId { get; set; }
-    public string EmployeeId { get; set; } = "";
+    public int EmployeeId { get; set; }
     public string FullName { get; set; } = "";
     public DateTime Birthdate { get; set; }
     public string CollegeProgram { get; set; } = "";

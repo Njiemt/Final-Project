@@ -5,7 +5,7 @@ using WarehouseManagementSystem.Data;
 namespace WarehouseManagementSystem.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("/api/[controller]")]
 public class InventoryItemsController : ControllerBase
 {
     private readonly WarehouseDbContext database;
@@ -16,21 +16,19 @@ public class InventoryItemsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<InventoryItem>>> Get(string? id)
+    public async Task<ActionResult<IEnumerable<InventoryItem>>> Get(int? id)
     {
-        if (string.IsNullOrWhiteSpace(id))
+        if (id == null)
         {
             return await database.InventoryItems.Take(5).ToListAsync();
         }
 
-        // ItemNumber is the public nine-digit lookup value. Fall back to ItemId
-        // so existing requests such as ?id=1 remain supported.
         var item = await database.InventoryItems
-            .FirstOrDefaultAsync(x => x.ItemNumber == id);
+            .FirstOrDefaultAsync(x => x.ItemNumber == id.Value);
 
-        if (item == null && int.TryParse(id, out var itemId))
+        if (item == null)
         {
-            item = await database.InventoryItems.FindAsync(itemId);
+            item = await database.InventoryItems.FindAsync(id.Value);
         }
 
         if (item == null) return NotFound();
@@ -38,7 +36,7 @@ public class InventoryItemsController : ControllerBase
     }
 
     [HttpGet("item-number/{itemNumber}")]
-    public async Task<ActionResult<InventoryItem>> GetByItemNumber(string itemNumber)
+    public async Task<ActionResult<InventoryItem>> GetByItemNumber(int itemNumber)
     {
         var item = await database.InventoryItems
             .FirstOrDefaultAsync(x => x.ItemNumber == itemNumber);

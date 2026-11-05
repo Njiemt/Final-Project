@@ -12,13 +12,12 @@ public partial class AddEmployeeIdAndItemNumberLookup : Migration
 {
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.AddColumn<string>(
+        migrationBuilder.AddColumn<int>(
             name: "EmployeeId",
             table: "TeamMembers",
-            type: "nvarchar(20)",
-            maxLength: 20,
+            type: "int",
             nullable: false,
-            defaultValue: "EMP001");
+            defaultValue: 1);
 
         migrationBuilder.CreateIndex(
             name: "IX_TeamMembers_EmployeeId",
@@ -33,22 +32,18 @@ public partial class AddEmployeeIdAndItemNumberLookup : Migration
             unique: true);
 
         migrationBuilder.Sql("""
-            IF NOT EXISTS (SELECT 1 FROM [TeamMembers] WHERE [EmployeeId] = 'EMP001')
+            IF NOT EXISTS (SELECT 1 FROM [TeamMembers] WHERE [EmployeeId] = 1)
             BEGIN
                 INSERT INTO [TeamMembers] ([EmployeeId], [FullName], [Birthdate], [CollegeProgram], [YearInProgram], [Email])
-                VALUES ('EMP001', 'Mohamed Njie', '2007-07-02', 'IT Software Development', 2, 'njiemt@mail.uc.edu');
+                VALUES (1, 'Mohamed Njie', '2007-07-02', 'IT Software Development', 2, 'njiemt@mail.uc.edu');
             END
             """);
 
-        migrationBuilder.Sql("""
-            UPDATE [InventoryItems]
-            SET [ItemNumber] = RIGHT('000000000' + CONVERT(varchar(9), [ItemId]), 9)
-            """);
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.Sql("DELETE FROM [TeamMembers] WHERE [EmployeeId] = 'EMP001';");
+        migrationBuilder.Sql("DELETE FROM [TeamMembers] WHERE [EmployeeId] = 1;");
 
         migrationBuilder.DropIndex(
             name: "IX_TeamMembers_EmployeeId",
